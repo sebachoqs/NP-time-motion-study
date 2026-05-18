@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Time & Motion Study</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #263248;
+  --border: #334155;
+  --accent: #818cf8;
+  --accent-dim: #3730a3;
+  --green: #10b981;
+  --green-dim: #064e3b;
+  --red: #f87171;
+  --red-dim: #7f1d1d;
+  --amber: #fbbf24;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #475569;
+  --r: 12px;
+  --r-sm: 8px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* NAV */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  display: flex;
+  align-items: stretch;
+  height: 52px;
+  gap: 4px;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.topbar-brand .logo {
+  width: 28px; height: 28px;
+  background: var(--accent-dim);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: var(--accent);
+}
+.topbar-brand .title { font-size: 13px; font-weight: 700; color: var(--text); }
+.topbar-brand .subtitle { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.tab-bar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  letter-spacing: 0.3px;
+}
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* SCREENS */
+.screen { display: none; padding: 16px; }
+.screen.active { display: block; }
+
+/* FORMS */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+}
+label {
+  font-size: 12px;
+  color: var(--text2);
+  display: block;
+  margin-bottom: 6px;
+}
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+input[type="text"], select, textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-size: 15px;
+  padding: 11px 13px;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--accent); }
+select option { background: var(--surface); }
+textarea { resize: vertical; min-height: 72px; }
+
+/* BUTTONS */
+.btn {
+  display: block; width: 100%;
+  padding: 14px;
+  border-radius: var(--r-sm);
+  border: none;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-success { background: var(--green); color: #fff; }
+.btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+.btn-sm { padding: 8px 14px; font-size: 13px; width: auto; display: inline-block; }
+.btn-row { display: flex; gap: 8px; margin-top: 12px; }
+.btn-row .btn { flex: 1; }
+
+/* SESSION PILL */
+.session-pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.session-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.session-pill strong { color: var(--text); }
+
+/* CATEGORY GRID */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.cat-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+}
+.cat-btn:active { transform: scale(0.96); }
+.cat-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.cat-btn .cat-icon { font-size: 22px; }
+.cat-btn .cat-name { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.cat-btn .cat-note { font-size: 10px; color: var(--text2); line-height: 1.4; margin-top: 4px; text-align: center; }
+.cat-btn.selected .cat-note { color: var(--accent2); }
+.cat-btn .cat-count {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+.cat-btn.selected .cat-count { background: var(--accent); color: #fff; }
+.cat-secondary { opacity: 0.75; }
+.cat-secondary:hover { opacity: 1; }
+.cat-divider {
+  grid-column: 1 / -1;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  padding: 8px 2px 2px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+/* STOPWATCH */
+.stopwatch-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.sw-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px; }
+.sw-category { font-size: 17px; font-weight: 700; color: var(--accent); margin-bottom: 20px; }
+.sw-time {
+  font-size: 56px;
+  font-weight: 300;
+  letter-spacing: -2px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-bottom: 8px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.sw-time.running { color: var(--green); }
+.sw-time.stopped { color: var(--amber); }
+.sw-start-time { font-size: 11px; color: var(--text3); margin-bottom: 24px; }
+
+/* PRODUCT FIELD */
+.product-field { margin-bottom: 12px; }
+
+/* RECORDS */
+.record-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 13px 15px;
+  margin-bottom: 8px;
+}
+.record-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.record-cat { font-size: 13px; font-weight: 700; color: var(--accent); }
+.record-dur {
+  font-size: 13px; font-weight: 700;
+  background: var(--surface2);
+  padding: 3px 10px;
+  border-radius: 20px;
+  color: var(--text);
+  font-family: monospace;
+}
+.record-meta { font-size: 11px; color: var(--text2); line-height: 1.6; }
+.record-product { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+/* SUMMARY TABLE */
+.summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.summary-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+.summary-table td { padding: 10px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.summary-table td:first-child { color: var(--text); font-weight: 600; }
+.summary-table td:last-child { color: var(--accent); font-weight: 700; font-family: monospace; }
+
+/* TOAST */
+.toast-container {
+  position: fixed;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: none;
+}
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+.toast.success { border-color: var(--green); color: var(--green); }
+.toast.error { border-color: var(--red); color: var(--red); }
+
+/* MISC */
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+.section-title:first-child { margin-top: 0; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; }
+.badge {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-red { background: var(--red-dim); color: var(--red); }
+.filter-row { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
+.filter-row select { flex: 1; font-size: 13px; padding: 8px 11px; }
+.count-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--text2);
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- ======== CONFIG — EDIT THIS ======== -->
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh0iq9D7QnnqCu1tjcT4XWxrHHYk9Th8Wilsm7PuTm06BoOECrquWrXnWfWJnigvfqEQ/exec";
+
+const CATEGORIES = [
+  { id: "no_labour",        name: "No Labour Intensive",        icon: "⚡", note: "Self-service or minimal staff involvement — e.g. shelf browsing, waiting area" },
+  { id: "dispensing",       name: "Dispensing",                 icon: "💊", note: "Prescription dispensing with clinical counselling and patient interaction" },
+  { id: "vaccination",      name: "Vaccination Time",           icon: "💉", note: "Full vaccination service including consent, administration and aftercare" },
+  { id: "health_check",     name: "Health Check",               icon: "🩺", note: "Blood pressure, diabetes, cholesterol or other in-store health assessments" },
+  { id: "sleep_apnoea",     name: "Sleep Apnoea",               icon: "😴", note: "CPAP consultations, mask fittings, device setup and ongoing support" },
+  { id: "fragrance_labour", name: "Fragrance Labour Intensive", icon: "🌸", note: "High-touch fragrance advisory — sampling, recommendations and gift wrapping" },
+  { id: "premium_beauty",   name: "Premium Beauty",             icon: "✨", note: "Skincare and beauty consultations requiring product knowledge and demonstration" },
+  { id: "retail_medium",    name: "Retail Labour Medium",       icon: "🛒", note: "Assisted retail sales with moderate staff effort — e.g. OTC advice, locating products" },
+  { id: "stock_receiving",  name: "Stock Receiving",            icon: "🚚", note: "Unpacking, checking and processing incoming stock deliveries", secondary: true },
+  { id: "inventory",        name: "Inventory",                  icon: "📦", note: "Stocktaking, cycle counts and shelf replenishment", secondary: true },
+  { id: "cleaning",         name: "Cleaning",                   icon: "🧹", note: "Store cleaning, sanitisation and general housekeeping tasks", secondary: true },
+  { id: "admin",            name: "Administrative",             icon: "📋", note: "Back-office tasks — emails, rosters, ordering, reporting", secondary: true },
+  { id: "other",            name: "Other",                      icon: "⋯",  note: "Any activity that does not fit the categories above", secondary: true }
+];
+
+const STORES = [
+  "Select store...",
+  "Store 001", "Store 002", "Store 003", "Store 004", "Store 005",
+  "Store 006", "Store 007", "Store 008", "Store 009", "Store 010"
+];
+</script>
+<!-- ===================================== -->
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="logo">T&M</div>
+    <div>
+      <div class="title">Time & Motion Study</div>
+      <div class="subtitle" id="topbar-session">Not started</div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('setup')">Session</button>
+  <button class="tab-btn" onclick="showTab('measure')">Measure</button>
+  <button class="tab-btn" onclick="showTab('records')">Records</button>
+  <button class="tab-btn" onclick="showTab('summary')">Summary</button>
+</div>
+
+<!-- ======== TAB: SETUP ======== -->
+<div class="screen active" id="tab-setup">
+  <div class="card">
+    <div class="card-title">Configure session</div>
+    <div class="field">
+      <label>Your name</label>
+      <input type="text" id="input-observer" placeholder="E.g. Sebastian" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Store</label>
+      <select id="input-store"></select>
+    </div>
+    <div class="field">
+      <label>Session notes (optional)</label>
+      <textarea id="input-session-notes" placeholder="E.g. Morning shift, Monday..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="startSession()" style="margin-top:20px">Start session</button>
+  </div>
+
+  <div class="card" id="api-config-card">
+    <div class="card-title">API Configuration</div>
+    <div class="field">
+      <label>Apps Script URL (Google Sheets backend)</label>
+      <input type="text" id="input-api-url" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="saveApiUrl()" style="margin-top:8px">Save URL</button>
+    <p style="font-size:11px; color:var(--text3); margin-top:10px; line-height:1.6">
+      Deploy the Apps Script as a Web App (access: Anyone) and paste the URL here. You only need to do this once per device.
+    </p>
+  </div>
+</div>
+
+<!-- ======== TAB: MEASURE ======== -->
+<div class="screen" id="tab-measure">
+  <div id="no-session-msg" class="empty-state">
+    Configure a session first<br>in the "Session" tab
+  </div>
+
+  <div id="measure-content" style="display:none">
+    <div class="session-pill">
+      <div class="dot"></div>
+      <span>Active session — <strong id="pill-observer"></strong> at <strong id="pill-store"></strong></span>
+    </div>
+
+    <div class="stopwatch-panel" id="sw-panel" style="display:none">
+      <div class="sw-label">Measuring</div>
+      <div class="sw-category" id="sw-cat-name"></div>
+      <div class="sw-time" id="sw-display">00:00</div>
+      <div class="sw-start-time" id="sw-start-label"></div>
+      <div class="product-field">
+        <input type="text" id="input-product" placeholder="Product name (optional)" style="text-align:center">
+      </div>
+      <div class="field" style="margin-top:8px">
+        <textarea id="input-notes" placeholder="Notes (optional)" style="font-size:13px; min-height:52px"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="cancelMeasure()">Cancel</button>
+        <button class="btn btn-success" id="btn-stop" onclick="stopMeasure()">Save</button>
+      </div>
+    </div>
+
+    <div class="section-title">Select a category</div>
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+</div>
+
+<!-- ======== TAB: RECORDS ======== -->
+<div class="screen" id="tab-records">
+  <div class="filter-row">
+    <select id="filter-store-records" onchange="renderRecords()">
+      <option value="">All stores</option>
+    </select>
+    <span class="count-chip" id="records-count">0 rec.</span>
+  </div>
+  <div id="records-list"></div>
+  <div style="display:flex; gap:8px; margin-top:12px">
+    <button class="btn btn-outline" style="flex:1" onclick="exportCSV()">Export CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="clearLocalRecords()">Clear local</button>
+  </div>
+</div>
+
+<!-- ======== TAB: SUMMARY ======== -->
+<div class="screen" id="tab-summary">
+  <div class="filter-row">
+    <select id="filter-store-summary" onchange="renderSummary()">
+      <option value="">All stores</option>
+    </select>
+  </div>
+  <div id="summary-content"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container">
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────
+let session = null;
+let swInterval = null;
+let swStart = null;
+let swCat = null;
+let records = [];
+let apiUrl = "";
+
+// ─── INIT ─────────────────────────────────────────────────
+function init() {
+  const storeSelect = document.getElementById("input-store");
+  STORES.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s === "Select store..." ? "" : s;
+    opt.textContent = s;
+    storeSelect.appendChild(opt);
+  });
+
+  apiUrl = localStorage.getItem("tm_api_url") || APPS_SCRIPT_URL;
+  if (apiUrl && apiUrl !== "PEGA_TU_URL_AQUI") {
+    document.getElementById("input-api-url").value = apiUrl;
+  }
+
+  const savedSession = localStorage.getItem("tm_session");
+  if (savedSession) {
+    session = JSON.parse(savedSession);
+    applySession();
+  }
+
+  records = JSON.parse(localStorage.getItem("tm_records") || "[]");
+  renderRecords();
+  renderSummary();
+  renderCatGrid();
+  populateStoreFilters();
+}
+
+// ─── SESSION ──────────────────────────────────────────────
+function startSession() {
+  const obs = document.getElementById("input-observer").value.trim();
+  const store = document.getElementById("input-store").value;
+  if (!obs) { showToast("Enter your name", "error"); return; }
+  if (!store) { showToast("Select a store", "error"); return; }
+
+  session = {
+    observer: obs,
+    store: store,
+    notes: document.getElementById("input-session-notes").value.trim(),
+    startedAt: new Date().toISOString()
+  };
+  localStorage.setItem("tm_session", JSON.stringify(session));
+  applySession();
+  showTab("measure");
+  showToast("Session started", "success");
+}
+
+function applySession() {
+  document.getElementById("topbar-session").textContent = session.observer + " · " + session.store;
+  document.getElementById("pill-observer").textContent = session.observer;
+  document.getElementById("pill-store").textContent = session.store;
+  document.getElementById("no-session-msg").style.display = "none";
+  document.getElementById("measure-content").style.display = "block";
+}
+
+// ─── API CONFIG ───────────────────────────────────────────
+function saveApiUrl() {
+  const url = document.getElementById("input-api-url").value.trim();
+  if (!url) { showToast("Enter the URL", "error"); return; }
+  apiUrl = url;
+  localStorage.setItem("tm_api_url", url);
+  showToast("URL saved", "success");
+}
+
+// ─── CATEGORY GRID ────────────────────────────────────────
+function renderCatGrid() {
+  const grid = document.getElementById("cat-grid");
+  grid.innerHTML = "";
+
+  const primary = CATEGORIES.filter(c => !c.secondary);
+  const secondary = CATEGORIES.filter(c => c.secondary);
+
+  function makeBtn(cat) {
+    const count = records.filter(r => r.category_id === cat.id).length;
+    const btn = document.createElement("div");
+    btn.className = "cat-btn" + (cat.secondary ? " cat-secondary" : "");
+    btn.id = "cat-" + cat.id;
+    btn.innerHTML = `
+      <div class="cat-count">${count}</div>
+      <div class="cat-icon">${cat.icon}</div>
+      <div class="cat-name">${cat.name}</div>
+      <div class="cat-note">${cat.note}</div>
+    `;
+    btn.onclick = () => startMeasure(cat);
+    grid.appendChild(btn);
+  }
+
+  primary.forEach(makeBtn);
+
+  const divider = document.createElement("div");
+  divider.className = "cat-divider";
+  divider.textContent = "General";
+  grid.appendChild(divider);
+
+  secondary.forEach(makeBtn);
+}
+
+// ─── STOPWATCH ────────────────────────────────────────────
+function startMeasure(cat) {
+  if (swInterval) { showToast("Ya hay una medición at curso", "error"); return; }
+  swCat = cat;
+  swStart = new Date();
+
+  document.getElementById("sw-cat-name").textContent = cat.icon + " " + cat.name;
+  document.getElementById("sw-start-label").textContent = "Start: " + formatTime(swStart);
+  document.getElementById("sw-display").className = "sw-time running";
+  document.getElementById("sw-panel").style.display = "block";
+  document.getElementById("input-product").value = "";
+  document.getElementById("input-notes").value = "";
+
+  document.getElementById("cat-" + cat.id).classList.add("selected");
+
+  swInterval = setInterval(updateDisplay, 100);
+  document.getElementById("sw-display").textContent = "00:00";
+}
+
+function updateDisplay() {
+  const elapsed = Math.floor((Date.now() - swStart) / 1000);
+  document.getElementById("sw-display").textContent = formatDuration(elapsed);
+}
+
+function stopMeasure() {
+  if (!swInterval) return;
+  const endTime = new Date();
+  clearInterval(swInterval);
+  swInterval = null;
+
+  const dur = Math.round((endTime - swStart) / 1000);
+  const record = {
+    id: Date.now().toString(),
+    store: session.store,
+    observer: session.observer,
+    category_id: swCat.id,
+    category: swCat.name,
+    product: document.getElementById("input-product").value.trim(),
+    start: swStart.toISOString(),
+    end: endTime.toISOString(),
+    duration_sec: dur,
+    notes: document.getElementById("input-notes").value.trim(),
+    syncedAt: null
+  };
+
+  records.push(record);
+  localStorage.setItem("tm_records", JSON.stringify(records));
+
+  document.getElementById("sw-panel").style.display = "none";
+  document.getElementById("cat-" + swCat.id).classList.remove("selected");
+  document.getElementById("sw-display").className = "sw-time";
+
+  renderCatGrid();
+  renderRecords();
+  renderSummary();
+  populateStoreFilters();
+
+  showToast("Saved: " + formatDuration(dur), "success");
+  syncRecord(record);
+}
+
+function cancelMeasure() {
+  if (!swInterval) return;
+  clearInterval(swInterval);
+  swInterval = null;
+  document.getElementById("sw-panel").style.display = "none";
+  if (swCat) document.getElementById("cat-" + swCat.id).classList.remove("selected");
+  document.getElementById("sw-display").className = "sw-time";
+  showToast("Measurement cancelled");
+}
+
+// ─── SYNC TO GOOGLE SHEETS ────────────────────────────────
+async function syncRecord(record) {
+  const url = apiUrl || localStorage.getItem("tm_api_url");
+  if (!url || url === "PEGA_TU_URL_AQUI") return;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "save",
+        record: {
+          store: record.store,
+          observer: record.observer,
+          category: record.category,
+          product: record.product,
+          start: record.start,
+          end: record.end,
+          duration_sec: record.duration_sec,
+          notes: record.notes
+        }
+      })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      record.syncedAt = new Date().toISOString();
+      record.remoteId = data.id;
+      localStorage.setItem("tm_records", JSON.stringify(records));
+      renderRecords();
+      showToast("Synced to Google Sheets ✓", "success");
+    }
+  } catch (e) {
+    showToast("Offline — saved locally", "");
+  }
+}
+
+async function syncAll() {
+  const unsynced = records.filter(r => !r.syncedAt);
+  if (!unsynced.length) { showToast("All synced"); return; }
+  showToast("Syncing " + unsynced.length + " records...");
+  for (const r of unsynced) await syncRecord(r);
+}
+
+// ─── RECORDS ─────────────────────────────────────────────
+function renderRecords() {
+  const filter = document.getElementById("filter-store-records") ?
+    document.getElementById("filter-store-records").value : "";
+  const filtered = filter ? records.filter(r => r.store === filter) : records;
+  const list = document.getElementById("records-list");
+  const countEl = document.getElementById("records-count");
+
+  if (countEl) countEl.textContent = filtered.length + " rec.";
+
+  if (!filtered.length) {
+    list.innerHTML = "<div class='empty-state'>No records yet</div>";
+    return;
+  }
+
+  const sorted = [...filtered].reverse();
+  list.innerHTML = sorted.map(r => `
+    <div class="record-item">
+      <div class="record-header">
+        <div class="record-cat">${getCatIcon(r.category_id)} ${r.category}</div>
+        <div class="record-dur">${formatDuration(r.duration_sec)}</div>
+      </div>
+      <div class="record-meta">
+        ${r.store} · ${r.observer} · ${formatTime(new Date(r.start))}
+        <span style="float:right">${r.syncedAt ? '<span class="badge badge-green">✓ sync</span>' : '<span class="badge badge-red">local</span>'}</span>
+      </div>
+      ${r.product ? `<div class="record-product">${r.product}</div>` : ""}
+    </div>
+  `).join("");
+}
+
+// ─── SUMMARY ──────────────────────────────────────────────
+function renderSummary() {
+  const filter = document.getElementById("filter-store-summary") ?
+    document.getElementById("filter-store-summary").value : "";
+  const filtered = filter ? records.filter(r => r.store === filter) : records;
+  const el = document.getElementById("summary-content");
+
+  if (!filtered.length) {
+    el.innerHTML = "<div class='empty-state'>No data yet</div>";
+    return;
+  }
+
+  const grouped = {};
+  filtered.forEach(r => {
+    if (!grouped[r.category]) grouped[r.category] = [];
+    grouped[r.category].push(r.duration_sec);
+  });
+
+  const totalRecords = filtered.length;
+  const totalStores = [...new Set(filtered.map(r => r.store))].length;
+
+  el.innerHTML = `
+    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:16px">
+      <div class="card" style="padding:14px; text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">RECORDS</div>
+        <div style="font-size:26px;font-weight:700;color:var(--accent)">${totalRecords}</div>
+      </div>
+      <div class="card" style="padding:14px; text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">STORES</div>
+        <div style="font-size:26px;font-weight:700;color:var(--accent)">${totalStores}</div>
+      </div>
+    </div>
+    <div class="card" style="padding:0; overflow:hidden">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th style="text-align:right">N</th>
+            <th style="text-align:right">Min</th>
+            <th style="text-align:right">Avg</th>
+            <th style="text-align:right">Max</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${Object.entries(grouped).map(([cat, vals]) => {
+            const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+            return `<tr>
+              <td>${cat}</td>
+              <td style="text-align:right;color:var(--text2)">${vals.length}</td>
+              <td style="text-align:right;color:var(--text2)">${formatDuration(Math.min(...vals))}</td>
+              <td style="text-align:right">${formatDuration(Math.round(avg))}</td>
+              <td style="text-align:right;color:var(--text2)">${formatDuration(Math.max(...vals))}</td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+    <button class="btn btn-outline" style="margin-top:12px" onclick="syncAll()">Sync pending records</button>
+  `;
+}
+
+// ─── STORE FILTERS ────────────────────────────────────────
+function populateStoreFilters() {
+  const stores = [...new Set(records.map(r => r.store))];
+  ["filter-store-records", "filter-store-summary"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const current = el.value;
+    el.innerHTML = '<option value="">All stores</option>';
+    stores.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s; opt.textContent = s;
+      el.appendChild(opt);
+    });
+    if (stores.includes(current)) el.value = current;
+  });
+}
+
+// ─── EXPORT CSV ──────────────────────────────────────────
+function exportCSV() {
+  if (!records.length) { showToast("No data to export", "error"); return; }
+  const headers = ["ID","Store","Observer","Category","Product","Inicio","Fin","Duration_sec","Minutes","Notes","Synced"];
+  const rows = records.map(r => [
+    r.id, r.store, r.observer, r.category, r.product || "",
+    r.start, r.end, r.duration_sec, (r.duration_sec/60).toFixed(2),
+    (r.notes || "").replace(/,/g,""), r.syncedAt ? "Yes" : "No"
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "time_motion_" + new Date().toISOString().slice(0,10) + ".csv";
+  a.click();
+  showToast("CSV exported");
+}
+
+function clearLocalRecords() {
+  if (!confirm("¿Eliminar todos los registros locales? (Los ya synceds quedan at Sheets)")) return;
+  records = [];
+  localStorage.removeItem("tm_records");
+  renderRecords();
+  renderSummary();
+  renderCatGrid();
+  showToast("Local records cleared");
+}
+
+// ─── UTILS ────────────────────────────────────────────────
+function formatDuration(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+}
+
+function formatTime(d) {
+  return d.toLocaleTimeString("en-AU", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+}
+
+function getCatIcon(id) {
+  const cat = CATEGORIES.find(c => c.id === id);
+  return cat ? cat.icon : "⋯";
+}
+
+function showToast(msg, type = "") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (type ? " " + type : "");
+  setTimeout(() => t.className = "toast", 2400);
+}
+
+function showTab(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  const tabs = ["setup","measure","records","summary"];
+  document.querySelectorAll(".tab-btn")[tabs.indexOf(name)].classList.add("active");
+  if (name === "records") { populateStoreFilters(); renderRecords(); }
+  if (name === "summary") { populateStoreFilters(); renderSummary(); }
+}
+
+// ─── START ────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
