@@ -351,7 +351,7 @@ textarea { resize: vertical; min-height: 72px; }
 
 <!-- ======== CONFIG — EDIT THIS ======== -->
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh0iq9D7QnnqCu1tjcT4XWxrHHYk9Th8Wilsm7PuTm06BoOECrquWrXnWfWJnigvfqEQ/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqdniA4u_saEKXUT_SF7RKHYZEWem9-oCCIdRk9oJoBwEZuFvkxGy5JwQ96lIESYsJ-g/exec";
 
 const CATEGORIES = [
   { id: "no_labour",        name: "No Labour Intensive",        icon: "⚡", note: "Self-service or minimal staff involvement — e.g. shelf browsing, waiting area" },
@@ -451,6 +451,7 @@ const STORES = [
       </div>
       <div class="btn-row">
         <button class="btn btn-danger" onclick="cancelMeasure()">Cancel</button>
+        <button class="btn btn-outline" id="btn-pause" onclick="pauseMeasure()">Pause</button>
         <button class="btn btn-success" id="btn-stop" onclick="stopMeasure()">Save</button>
       </div>
     </div>
@@ -496,6 +497,8 @@ let session = null;
 let swInterval = null;
 let swStart = null;
 let swCat = null;
+let swPausedAt = null;
+let swElapsed = 0;
 let records = [];
 let apiUrl = "";
 
@@ -601,9 +604,13 @@ function startMeasure(cat) {
   if (swInterval) { showToast("Ya hay una medición at curso", "error"); return; }
   swCat = cat;
   swStart = new Date();
+  swPausedAt = null;
+  swElapsed = 0;
 
   document.getElementById("sw-cat-name").textContent = cat.icon + " " + cat.name;
   document.getElementById("sw-start-label").textContent = "Start: " + formatTime(swStart);
+  document.getElementById("btn-pause").textContent = "Pause";
+  document.getElementById("btn-pause").onclick = pauseMeasure;
   document.getElementById("sw-display").className = "sw-time running";
   document.getElementById("sw-panel").style.display = "block";
   document.getElementById("input-product").value = "";
@@ -616,8 +623,29 @@ function startMeasure(cat) {
 }
 
 function updateDisplay() {
-  const elapsed = Math.floor((Date.now() - swStart) / 1000);
+  const elapsed = swElapsed + Math.floor((Date.now() - swStart) / 1000);
   document.getElementById("sw-display").textContent = formatDuration(elapsed);
+}
+
+function pauseMeasure() {
+  if (!swInterval || swPausedAt) return;
+  clearInterval(swInterval);
+  swInterval = null;
+  swPausedAt = new Date();
+  swElapsed += Math.floor((swPausedAt - swStart) / 1000);
+  document.getElementById("sw-display").className = "sw-time stopped";
+  document.getElementById("btn-pause").textContent = "Resume";
+  document.getElementById("btn-pause").onclick = resumeMeasure;
+}
+
+function resumeMeasure() {
+  if (swInterval) return;
+  swStart = new Date();
+  swPausedAt = null;
+  swInterval = setInterval(updateDisplay, 100);
+  document.getElementById("sw-display").className = "sw-time running";
+  document.getElementById("btn-pause").textContent = "Pause";
+  document.getElementById("btn-pause").onclick = pauseMeasure;
 }
 
 function stopMeasure() {
@@ -626,7 +654,9 @@ function stopMeasure() {
   clearInterval(swInterval);
   swInterval = null;
 
-  const dur = Math.round((endTime - swStart) / 1000);
+  // If currently running, add time since last resume
+  if (!swPausedAt) swElapsed += Math.round((endTime - swStart) / 1000);
+  const dur = swElapsed;
   const record = {
     id: Date.now().toString(),
     store: session.store,
@@ -634,8 +664,9 @@ function stopMeasure() {
     category_id: swCat.id,
     category: swCat.name,
     product: document.getElementById("input-product").value.trim(),
-    start: swStart.toLocaleString("en-AU", { timeZone:"Australia/Adelaide" }),
-    end: endTime.toLocaleString("en-AU", { timeZone:"Australia/Adelaide" }),
+    start: swStart.toISOString(),
+    end: endTime.toISOString(),
+    end_adjusted: new Date(swStart.getTime() + dur * 1000).toISOString(),
     duration_sec: dur,
     notes: document.getElementById("input-notes").value.trim(),
     syncedAt: null
@@ -684,6 +715,7 @@ async function syncRecord(record) {
           product: record.product,
           start: record.start,
           end: record.end,
+          end_adjusted: record.end_adjusted,
           duration_sec: record.duration_sec,
           notes: record.notes
         }
@@ -821,10 +853,10 @@ function populateStoreFilters() {
 // ─── EXPORT CSV ──────────────────────────────────────────
 function exportCSV() {
   if (!records.length) { showToast("No data to export", "error"); return; }
-  const headers = ["ID","Store","Observer","Category","Product","Inicio","Fin","Duration_sec","Minutes","Notes","Synced"];
+  const headers = ["ID","Store","Observer","Category","Product","Start","End_Raw","End_Adjusted","Duration_sec","Minutes","Notes","Synced"];
   const rows = records.map(r => [
     r.id, r.store, r.observer, r.category, r.product || "",
-    r.start, r.end, r.duration_sec, (r.duration_sec/60).toFixed(2),
+    r.start, r.end, r.end_adjusted, r.duration_sec, (r.duration_sec/60).toFixed(2),
     (r.notes || "").replace(/,/g,""), r.syncedAt ? "Yes" : "No"
   ]);
   const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
@@ -854,7 +886,7 @@ function formatDuration(seconds) {
 }
 
 function formatTime(d) {
-  return d.toLocaleTimeString("en-AU", { hour:"2-digit", minute:"2-digit", second:"2-digit", timeZone:"Australia/Adelaide" });
+  return d.toLocaleTimeString("en-AU", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
 }
 
 function getCatIcon(id) {
