@@ -664,9 +664,9 @@ function stopMeasure() {
     category_id: swCat.id,
     category: swCat.name,
     product: document.getElementById("input-product").value.trim(),
-    start: swStart.toISOString(),
-    end: endTime.toISOString(),
-    end_adjusted: new Date(swStart.getTime() + dur * 1000).toISOString(),
+    start: swStart.toLocaleString("en-AU", { timeZone:"Australia/Adelaide" }),
+    end: endTime.toLocaleString("en-AU", { timeZone:"Australia/Adelaide" }),
+    end_adjusted: new Date(swStart.getTime() + dur * 1000).toLocaleString("en-AU", { timeZone:"Australia/Adelaide" }),
     duration_sec: dur,
     notes: document.getElementById("input-notes").value.trim(),
     syncedAt: null
@@ -886,7 +886,7 @@ function formatDuration(seconds) {
 }
 
 function formatTime(d) {
-  return d.toLocaleTimeString("en-AU", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+  return d.toLocaleTimeString("en-AU", { hour:"2-digit", minute:"2-digit", second:"2-digit", timeZone:"Australia/Adelaide" });
 }
 
 function getCatIcon(id) {
