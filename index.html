@@ -601,7 +601,7 @@ function renderCatGrid() {
 
 // ─── STOPWATCH ────────────────────────────────────────────
 function startMeasure(cat) {
-  if (swInterval) { showToast("Ya hay una medición at curso", "error"); return; }
+  if (swInterval) { showToast("There is a measurement already running", "error"); return; }
   swCat = cat;
   swStart = new Date();
   swPausedAt = null;
@@ -869,7 +869,7 @@ function exportCSV() {
 }
 
 function clearLocalRecords() {
-  if (!confirm("¿Eliminar todos los registros locales? (Los ya synceds quedan at Sheets)")) return;
+  if (!confirm("Do you want to delete all the local measurements? (the once already synced won't be deleted)")) return;
   records = [];
   localStorage.removeItem("tm_records");
   renderRecords();
