@@ -9,7 +9,7 @@
 <title>Time & Motion Study</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
+ 
 :root {
   --bg: #0f172a;
   --surface: #1e293b;
@@ -28,7 +28,7 @@
   --r: 12px;
   --r-sm: 8px;
 }
-
+ 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg);
@@ -37,7 +37,7 @@ body {
   max-width: 480px;
   margin: 0 auto;
 }
-
+ 
 /* NAV */
 .topbar {
   background: var(--surface);
@@ -83,11 +83,11 @@ body {
   letter-spacing: 0.3px;
 }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-
+ 
 /* SCREENS */
 .screen { display: none; padding: 16px; }
 .screen.active { display: block; }
-
+ 
 /* FORMS */
 .card {
   background: var(--surface);
@@ -127,7 +127,7 @@ input[type="text"], select, textarea {
 input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--accent); }
 select option { background: var(--surface); }
 textarea { resize: vertical; min-height: 72px; }
-
+ 
 /* BUTTONS */
 .btn {
   display: block; width: 100%;
@@ -149,7 +149,7 @@ textarea { resize: vertical; min-height: 72px; }
 .btn-sm { padding: 8px 14px; font-size: 13px; width: auto; display: inline-block; }
 .btn-row { display: flex; gap: 8px; margin-top: 12px; }
 .btn-row .btn { flex: 1; }
-
+ 
 /* SESSION PILL */
 .session-pill {
   background: var(--surface2);
@@ -166,7 +166,7 @@ textarea { resize: vertical; min-height: 72px; }
 }
 .session-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 .session-pill strong { color: var(--text); }
-
+ 
 /* CATEGORY GRID */
 .cat-grid {
   display: grid;
@@ -225,7 +225,7 @@ textarea { resize: vertical; min-height: 72px; }
   border-top: 1px solid var(--border);
   margin-top: 4px;
 }
-
+ 
 /* STOPWATCH */
 .stopwatch-panel {
   background: var(--surface);
@@ -250,10 +250,10 @@ textarea { resize: vertical; min-height: 72px; }
 .sw-time.running { color: var(--green); }
 .sw-time.stopped { color: var(--amber); }
 .sw-start-time { font-size: 11px; color: var(--text3); margin-bottom: 24px; }
-
+ 
 /* PRODUCT FIELD */
 .product-field { margin-bottom: 12px; }
-
+ 
 /* RECORDS */
 .record-item {
   background: var(--surface);
@@ -274,7 +274,7 @@ textarea { resize: vertical; min-height: 72px; }
 }
 .record-meta { font-size: 11px; color: var(--text2); line-height: 1.6; }
 .record-product { font-size: 12px; color: var(--text3); margin-top: 4px; }
-
+ 
 /* SUMMARY TABLE */
 .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .summary-table th {
@@ -290,7 +290,7 @@ textarea { resize: vertical; min-height: 72px; }
 .summary-table td { padding: 10px; border-bottom: 1px solid var(--border); color: var(--text2); }
 .summary-table td:first-child { color: var(--text); font-weight: 600; }
 .summary-table td:last-child { color: var(--accent); font-weight: 700; font-family: monospace; }
-
+ 
 /* TOAST */
 .toast-container {
   position: fixed;
@@ -313,7 +313,7 @@ textarea { resize: vertical; min-height: 72px; }
 .toast.show { opacity: 1; }
 .toast.success { border-color: var(--green); color: var(--green); }
 .toast.error { border-color: var(--red); color: var(--red); }
-
+ 
 /* MISC */
 .section-title {
   font-size: 11px;
@@ -348,12 +348,14 @@ textarea { resize: vertical; min-height: 72px; }
 </style>
 </head>
 <body>
-
+ 
 <!-- ======== CONFIG — EDIT THIS ======== -->
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqdniA4u_saEKXUT_SF7RKHYZEWem9-oCCIdRk9oJoBwEZuFvkxGy5JwQ96lIESYsJ-g/exec";
-
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh0iq9D7QnnqCu1tjcT4XWxrHHYk9Th8Wilsm7PuTm06BoOECrquWrXnWfWJnigvfqEQ/exec";
+ 
 const CATEGORIES = [
+  { id: "drop_script",      name: "Drop Script",                icon: "📝", note: "Patient drops off prescription — includes greeting, data entry and script intake" },
+  { id: "pick_medicines",   name: "Pick Medicines",             icon: "🛍️", note: "Patient collects dispensed medicines — includes counselling, payment and farewell" },
   { id: "no_labour",        name: "No Labour Intensive",        icon: "⚡", note: "Self-service or minimal staff involvement — e.g. shelf browsing, waiting area" },
   { id: "dispensing",       name: "Dispensing",                 icon: "💊", note: "Prescription dispensing with clinical counselling and patient interaction" },
   { id: "vaccination",      name: "Vaccination Time",           icon: "💉", note: "Full vaccination service including consent, administration and aftercare" },
@@ -368,15 +370,15 @@ const CATEGORIES = [
   { id: "admin",            name: "Administrative",             icon: "📋", note: "Back-office tasks — emails, rosters, ordering, reporting", secondary: true },
   { id: "other",            name: "Other",                      icon: "⋯",  note: "Any activity that does not fit the categories above", secondary: true }
 ];
-
+ 
 const STORES = [
   "Select store...",
-  "Findon", "Store 002", "Store 003", "Store 004", "Store 005",
+  "Store 001", "Store 002", "Store 003", "Store 004", "Store 005",
   "Store 006", "Store 007", "Store 008", "Store 009", "Store 010"
 ];
 </script>
 <!-- ===================================== -->
-
+ 
 <div class="topbar">
   <div class="topbar-brand">
     <div class="logo">T&M</div>
@@ -386,14 +388,14 @@ const STORES = [
     </div>
   </div>
 </div>
-
+ 
 <div class="tab-bar">
   <button class="tab-btn active" onclick="showTab('setup')">Session</button>
   <button class="tab-btn" onclick="showTab('measure')">Measure</button>
   <button class="tab-btn" onclick="showTab('records')">Records</button>
   <button class="tab-btn" onclick="showTab('summary')">Summary</button>
 </div>
-
+ 
 <!-- ======== TAB: SETUP ======== -->
 <div class="screen active" id="tab-setup">
   <div class="card">
@@ -412,7 +414,7 @@ const STORES = [
     </div>
     <button class="btn btn-primary" onclick="startSession()" style="margin-top:20px">Start session</button>
   </div>
-
+ 
   <div class="card" id="api-config-card">
     <div class="card-title">API Configuration</div>
     <div class="field">
@@ -425,19 +427,19 @@ const STORES = [
     </p>
   </div>
 </div>
-
+ 
 <!-- ======== TAB: MEASURE ======== -->
 <div class="screen" id="tab-measure">
   <div id="no-session-msg" class="empty-state">
     Configure a session first<br>in the "Session" tab
   </div>
-
+ 
   <div id="measure-content" style="display:none">
     <div class="session-pill">
       <div class="dot"></div>
       <span>Active session — <strong id="pill-observer"></strong> at <strong id="pill-store"></strong></span>
     </div>
-
+ 
     <div class="stopwatch-panel" id="sw-panel" style="display:none">
       <div class="sw-label">Measuring</div>
       <div class="sw-category" id="sw-cat-name"></div>
@@ -445,6 +447,9 @@ const STORES = [
       <div class="sw-start-time" id="sw-start-label"></div>
       <div class="product-field">
         <input type="text" id="input-product" placeholder="Product name (optional)" style="text-align:center">
+      </div>
+      <div class="product-field" style="margin-top:8px; display:flex; gap:8px; align-items:center">
+        <input type="number" id="input-qty" placeholder="Qty (items)" min="1" style="text-align:center; flex:1">
       </div>
       <div class="field" style="margin-top:8px">
         <textarea id="input-notes" placeholder="Notes (optional)" style="font-size:13px; min-height:52px"></textarea>
@@ -455,12 +460,12 @@ const STORES = [
         <button class="btn btn-success" id="btn-stop" onclick="stopMeasure()">Save</button>
       </div>
     </div>
-
+ 
     <div class="section-title">Select a category</div>
     <div class="cat-grid" id="cat-grid"></div>
   </div>
 </div>
-
+ 
 <!-- ======== TAB: RECORDS ======== -->
 <div class="screen" id="tab-records">
   <div class="filter-row">
@@ -475,7 +480,7 @@ const STORES = [
     <button class="btn btn-outline btn-sm" onclick="clearLocalRecords()">Clear local</button>
   </div>
 </div>
-
+ 
 <!-- ======== TAB: SUMMARY ======== -->
 <div class="screen" id="tab-summary">
   <div class="filter-row">
@@ -485,12 +490,12 @@ const STORES = [
   </div>
   <div id="summary-content"></div>
 </div>
-
+ 
 <!-- TOAST -->
 <div class="toast-container">
   <div class="toast" id="toast"></div>
 </div>
-
+ 
 <script>
 // ─── STATE ───────────────────────────────────────────────
 let session = null;
@@ -501,7 +506,7 @@ let swPausedAt = null;
 let swElapsed = 0;
 let records = [];
 let apiUrl = "";
-
+ 
 // ─── INIT ─────────────────────────────────────────────────
 function init() {
   const storeSelect = document.getElementById("input-store");
@@ -511,32 +516,32 @@ function init() {
     opt.textContent = s;
     storeSelect.appendChild(opt);
   });
-
+ 
   apiUrl = localStorage.getItem("tm_api_url") || APPS_SCRIPT_URL;
   if (apiUrl && apiUrl !== "PEGA_TU_URL_AQUI") {
     document.getElementById("input-api-url").value = apiUrl;
   }
-
+ 
   const savedSession = localStorage.getItem("tm_session");
   if (savedSession) {
     session = JSON.parse(savedSession);
     applySession();
   }
-
+ 
   records = JSON.parse(localStorage.getItem("tm_records") || "[]");
   renderRecords();
   renderSummary();
   renderCatGrid();
   populateStoreFilters();
 }
-
+ 
 // ─── SESSION ──────────────────────────────────────────────
 function startSession() {
   const obs = document.getElementById("input-observer").value.trim();
   const store = document.getElementById("input-store").value;
   if (!obs) { showToast("Enter your name", "error"); return; }
   if (!store) { showToast("Select a store", "error"); return; }
-
+ 
   session = {
     observer: obs,
     store: store,
@@ -548,7 +553,7 @@ function startSession() {
   showTab("measure");
   showToast("Session started", "success");
 }
-
+ 
 function applySession() {
   document.getElementById("topbar-session").textContent = session.observer + " · " + session.store;
   document.getElementById("pill-observer").textContent = session.observer;
@@ -556,7 +561,7 @@ function applySession() {
   document.getElementById("no-session-msg").style.display = "none";
   document.getElementById("measure-content").style.display = "block";
 }
-
+ 
 // ─── API CONFIG ───────────────────────────────────────────
 function saveApiUrl() {
   const url = document.getElementById("input-api-url").value.trim();
@@ -565,15 +570,15 @@ function saveApiUrl() {
   localStorage.setItem("tm_api_url", url);
   showToast("URL saved", "success");
 }
-
+ 
 // ─── CATEGORY GRID ────────────────────────────────────────
 function renderCatGrid() {
   const grid = document.getElementById("cat-grid");
   grid.innerHTML = "";
-
+ 
   const primary = CATEGORIES.filter(c => !c.secondary);
   const secondary = CATEGORIES.filter(c => c.secondary);
-
+ 
   function makeBtn(cat) {
     const count = records.filter(r => r.category_id === cat.id).length;
     const btn = document.createElement("div");
@@ -588,25 +593,25 @@ function renderCatGrid() {
     btn.onclick = () => startMeasure(cat);
     grid.appendChild(btn);
   }
-
+ 
   primary.forEach(makeBtn);
-
+ 
   const divider = document.createElement("div");
   divider.className = "cat-divider";
   divider.textContent = "General";
   grid.appendChild(divider);
-
+ 
   secondary.forEach(makeBtn);
 }
-
+ 
 // ─── STOPWATCH ────────────────────────────────────────────
 function startMeasure(cat) {
-  if (swInterval) { showToast("There is a measurement already running", "error"); return; }
+  if (swInterval) { showToast("A measurement is already running", "error"); return; }
   swCat = cat;
   swStart = new Date();
   swPausedAt = null;
   swElapsed = 0;
-
+ 
   document.getElementById("sw-cat-name").textContent = cat.icon + " " + cat.name;
   document.getElementById("sw-start-label").textContent = "Start: " + formatTime(swStart);
   document.getElementById("btn-pause").textContent = "Pause";
@@ -614,19 +619,20 @@ function startMeasure(cat) {
   document.getElementById("sw-display").className = "sw-time running";
   document.getElementById("sw-panel").style.display = "block";
   document.getElementById("input-product").value = "";
+  document.getElementById("input-qty").value = "";
   document.getElementById("input-notes").value = "";
-
+ 
   document.getElementById("cat-" + cat.id).classList.add("selected");
-
+ 
   swInterval = setInterval(updateDisplay, 100);
   document.getElementById("sw-display").textContent = "00:00";
 }
-
+ 
 function updateDisplay() {
   const elapsed = swElapsed + Math.floor((Date.now() - swStart) / 1000);
   document.getElementById("sw-display").textContent = formatDuration(elapsed);
 }
-
+ 
 function pauseMeasure() {
   if (!swInterval || swPausedAt) return;
   clearInterval(swInterval);
@@ -637,7 +643,7 @@ function pauseMeasure() {
   document.getElementById("btn-pause").textContent = "Resume";
   document.getElementById("btn-pause").onclick = resumeMeasure;
 }
-
+ 
 function resumeMeasure() {
   if (swInterval) return;
   swStart = new Date();
@@ -647,13 +653,13 @@ function resumeMeasure() {
   document.getElementById("btn-pause").textContent = "Pause";
   document.getElementById("btn-pause").onclick = pauseMeasure;
 }
-
+ 
 function stopMeasure() {
   if (!swInterval) return;
   const endTime = new Date();
   clearInterval(swInterval);
   swInterval = null;
-
+ 
   // If currently running, add time since last resume
   if (!swPausedAt) swElapsed += Math.round((endTime - swStart) / 1000);
   const dur = swElapsed;
@@ -664,30 +670,31 @@ function stopMeasure() {
     category_id: swCat.id,
     category: swCat.name,
     product: document.getElementById("input-product").value.trim(),
-    start: swStart.toLocaleString("en-AU", { timeZone:"Australia/Adelaide" }),
-    end: endTime.toLocaleString("en-AU", { timeZone:"Australia/Adelaide" }),
-    end_adjusted: new Date(swStart.getTime() + dur * 1000).toLocaleString("en-AU", { timeZone:"Australia/Adelaide" }),
+    qty: document.getElementById("input-qty").value || "",
+    start: swStart.toLocaleString("en-AU", { timeZone: "Australia/Adelaide" }),
+    end: endTime.toLocaleString("en-AU", { timeZone: "Australia/Adelaide" }),
+    end_adjusted: new Date(swStart.getTime() + dur * 1000).toLocaleString("en-AU", { timeZone: "Australia/Adelaide" }),
     duration_sec: dur,
     notes: document.getElementById("input-notes").value.trim(),
     syncedAt: null
   };
-
+ 
   records.push(record);
   localStorage.setItem("tm_records", JSON.stringify(records));
-
+ 
   document.getElementById("sw-panel").style.display = "none";
   document.getElementById("cat-" + swCat.id).classList.remove("selected");
   document.getElementById("sw-display").className = "sw-time";
-
+ 
   renderCatGrid();
   renderRecords();
   renderSummary();
   populateStoreFilters();
-
+ 
   showToast("Saved: " + formatDuration(dur), "success");
   syncRecord(record);
 }
-
+ 
 function cancelMeasure() {
   if (!swInterval) return;
   clearInterval(swInterval);
@@ -697,12 +704,12 @@ function cancelMeasure() {
   document.getElementById("sw-display").className = "sw-time";
   showToast("Measurement cancelled");
 }
-
+ 
 // ─── SYNC TO GOOGLE SHEETS ────────────────────────────────
 async function syncRecord(record) {
   const url = apiUrl || localStorage.getItem("tm_api_url");
   if (!url || url === "PEGA_TU_URL_AQUI") return;
-
+ 
   try {
     const res = await fetch(url, {
       method: "POST",
@@ -713,6 +720,7 @@ async function syncRecord(record) {
           observer: record.observer,
           category: record.category,
           product: record.product,
+          qty: record.qty,
           start: record.start,
           end: record.end,
           end_adjusted: record.end_adjusted,
@@ -733,14 +741,14 @@ async function syncRecord(record) {
     showToast("Offline — saved locally", "");
   }
 }
-
+ 
 async function syncAll() {
   const unsynced = records.filter(r => !r.syncedAt);
   if (!unsynced.length) { showToast("All synced"); return; }
   showToast("Syncing " + unsynced.length + " records...");
   for (const r of unsynced) await syncRecord(r);
 }
-
+ 
 // ─── RECORDS ─────────────────────────────────────────────
 function renderRecords() {
   const filter = document.getElementById("filter-store-records") ?
@@ -748,14 +756,14 @@ function renderRecords() {
   const filtered = filter ? records.filter(r => r.store === filter) : records;
   const list = document.getElementById("records-list");
   const countEl = document.getElementById("records-count");
-
+ 
   if (countEl) countEl.textContent = filtered.length + " rec.";
-
+ 
   if (!filtered.length) {
     list.innerHTML = "<div class='empty-state'>No records yet</div>";
     return;
   }
-
+ 
   const sorted = [...filtered].reverse();
   list.innerHTML = sorted.map(r => `
     <div class="record-item">
@@ -771,28 +779,28 @@ function renderRecords() {
     </div>
   `).join("");
 }
-
+ 
 // ─── SUMMARY ──────────────────────────────────────────────
 function renderSummary() {
   const filter = document.getElementById("filter-store-summary") ?
     document.getElementById("filter-store-summary").value : "";
   const filtered = filter ? records.filter(r => r.store === filter) : records;
   const el = document.getElementById("summary-content");
-
+ 
   if (!filtered.length) {
     el.innerHTML = "<div class='empty-state'>No data yet</div>";
     return;
   }
-
+ 
   const grouped = {};
   filtered.forEach(r => {
     if (!grouped[r.category]) grouped[r.category] = [];
     grouped[r.category].push(r.duration_sec);
   });
-
+ 
   const totalRecords = filtered.length;
   const totalStores = [...new Set(filtered.map(r => r.store))].length;
-
+ 
   el.innerHTML = `
     <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:16px">
       <div class="card" style="padding:14px; text-align:center">
@@ -832,7 +840,7 @@ function renderSummary() {
     <button class="btn btn-outline" style="margin-top:12px" onclick="syncAll()">Sync pending records</button>
   `;
 }
-
+ 
 // ─── STORE FILTERS ────────────────────────────────────────
 function populateStoreFilters() {
   const stores = [...new Set(records.map(r => r.store))];
@@ -849,13 +857,13 @@ function populateStoreFilters() {
     if (stores.includes(current)) el.value = current;
   });
 }
-
+ 
 // ─── EXPORT CSV ──────────────────────────────────────────
 function exportCSV() {
   if (!records.length) { showToast("No data to export", "error"); return; }
-  const headers = ["ID","Store","Observer","Category","Product","Start","End_Raw","End_Adjusted","Duration_sec","Minutes","Notes","Synced"];
+  const headers = ["ID","Store","Observer","Category","Product","Qty","Start","End_Raw","End_Adjusted","Duration_sec","Minutes","Notes","Synced"];
   const rows = records.map(r => [
-    r.id, r.store, r.observer, r.category, r.product || "",
+    r.id, r.store, r.observer, r.category, r.product || "", r.qty || "",
     r.start, r.end, r.end_adjusted, r.duration_sec, (r.duration_sec/60).toFixed(2),
     (r.notes || "").replace(/,/g,""), r.syncedAt ? "Yes" : "No"
   ]);
@@ -867,9 +875,9 @@ function exportCSV() {
   a.click();
   showToast("CSV exported");
 }
-
+ 
 function clearLocalRecords() {
-  if (!confirm("Do you want to delete all the local measurements? (the once already synced won't be deleted)")) return;
+  if (!confirm("Delete all local records? (Already synced ones remain in Sheets)")) return;
   records = [];
   localStorage.removeItem("tm_records");
   renderRecords();
@@ -877,30 +885,30 @@ function clearLocalRecords() {
   renderCatGrid();
   showToast("Local records cleared");
 }
-
+ 
 // ─── UTILS ────────────────────────────────────────────────
 function formatDuration(seconds) {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
 }
-
+ 
 function formatTime(d) {
-  return d.toLocaleTimeString("en-AU", { hour:"2-digit", minute:"2-digit", second:"2-digit", timeZone:"Australia/Adelaide" });
+  return d.toLocaleTimeString("en-AU", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
 }
-
+ 
 function getCatIcon(id) {
   const cat = CATEGORIES.find(c => c.id === id);
   return cat ? cat.icon : "⋯";
 }
-
+ 
 function showToast(msg, type = "") {
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.className = "toast show" + (type ? " " + type : "");
   setTimeout(() => t.className = "toast", 2400);
 }
-
+ 
 function showTab(name) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -910,7 +918,7 @@ function showTab(name) {
   if (name === "records") { populateStoreFilters(); renderRecords(); }
   if (name === "summary") { populateStoreFilters(); renderSummary(); }
 }
-
+ 
 // ─── START ────────────────────────────────────────────────
 init();
 </script>
